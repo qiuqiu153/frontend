@@ -5,15 +5,14 @@ import type {chat_message} from "./chatType"
 
 enum MessageUrl{
     base="/CompanyGPT",
-    CompanyGPT="/chatgpt/",
-
-    CompanySpark="/chatgpt/",
-
-    向量数据库="/chatgpt/",
+    ChatUrl="/chat/"
 
 }
 
 
-export type option=keyof typeof MessageUrl
 
-export const sendMessageAPI=(option:option,message:string,chat_id:number)=>request.post<any,chat_message>(MessageUrl.base+MessageUrl[option],{message,chat_id})
+
+export type option="CompanyGPT"|'CompanySpark'|'向量数据库'
+
+export const sendMessageAPI=
+(option:option,message:string,chat_id:number)=>request.post<any,chat_message>(MessageUrl.base+MessageUrl.ChatUrl,{message,chat_id,option})

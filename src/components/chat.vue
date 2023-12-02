@@ -29,7 +29,7 @@
                            <el-dropdown-menu>
                               <el-dropdown-item icon="Delete" command="Delete"> <el-popconfirm width="220" :temported="false"
                                     confirm-button-text="确定" cancel-button-text="取消" icon-color="red"
-                                    title="您要删除对话吗?删除后不能恢复" @confirm="DeleteChatHistory">
+                                    title="您要删除对话吗?删除后不能恢复" @confirm="DeleteChatHistory(item.id)">
                                     <template #reference>
                                        <span>Delete</span>
                                     </template>
@@ -351,7 +351,7 @@ import logo from "./logo.vue";
 import type { chat_message, chat_history } from "@/api/chatType"
 import type { option } from "@/api/sendMessage"
 import { ref, onMounted, watch } from "vue"
-import { getChatHitoryList, getChatMessages, createHistory } from "@/api/chatHistory"
+import { getChatHitoryList, getChatMessages, createHistory, deletehistory } from "@/api/chatHistory"
 import { sendMessageAPI } from "@/api/sendMessage"
 import { ElMessage } from "element-plus";
 
@@ -363,12 +363,17 @@ let handleCommand = (command: string) => {
 
 }
 
-let DeleteChatHistory = (e:any) => {
-   console.log(e)
+let DeleteChatHistory = async(id:number) => {
+   let result=await deletehistory(id)
+   console.log(result)
+
+   gethistoryList()
+
+
 }
 
 
-let historyList = ref<chat_history>()
+let historyList = ref<chat_history[]>()
 let messages = ref<chat_message[]>([{
    "id": 47,
    "user_input": "你知道什么是vue2嘛",
@@ -405,14 +410,19 @@ const Options = [
 const option = ref<option>("CompanyGPT")
 
 const userInput = ref("")
-onMounted(async () => {
+
+let gethistoryList=async () => {
    historyList.value = await getChatHitoryList()
-
+   chat_id.value = (historyList.value as chat_history[])[0].id
    console.log(historyList)
+   
 
-   chat_id.value = 41
-
+}
+onMounted(async()=>{
+   await gethistoryList()
+   
 })
+
 let sendMessage = async () => {
 
    let message:chat_message={user_input:userInput.value,gpt_response:""}
